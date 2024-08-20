@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+                id="account_invoice_bs"
+                model="account.invoice"
+                string="Factura Bolivianos"
+                report_type="qweb-pdf"
+                name="kardex_inventario.report_invoice_bs"
+                file="kardex_inventario.report_invoice_bs"
+        />
+    </data>
+</odoo>

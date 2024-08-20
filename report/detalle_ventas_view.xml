@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_detalle_ventas_search" model="ir.ui.view">
+            <field name="name">detalle.ventas.search</field>
+            <field name="model">detalle.ventas</field>
+            <field name="arch" type="xml">
+                <search string="Ajuste">
+                    <field name="journal_id"/>
+                    <field name="warehouse_id"/>
+                    <field name="number"/>
+                    <field name="clie"/>
+                    <filter name="estado_f" string="Abierto"
+                            domain="[('estado', 'in', ['Abierto'])]"/>
+                    <filter name="estado_fa" string="Pagado"
+                            domain="[('estado', 'in', ['Pagado'])]"/>
+                    <filter name="estado_fb" string="Abierto + Pagado"
+                            domain="[('estado', 'in', ['Abierto','Pagado'])]"/>
+                    <filter name="today" string="Hoy"
+                            domain="[('date_invoice', '&gt;=', datetime.datetime.now().replace(hour=0, minute=0, second=0)),('date_invoice', '&lt;=', datetime.datetime.now().replace(hour=23, minute=59, second=59))]"/>
+                    <filter name="week" string="Esta Semana"
+                            domain="[
+                                '&amp;',
+                                ('date_invoice', '>=', (context_today() + relativedelta(weeks=-1,days=1,weekday=0)).strftime('%Y-%m-%d')),
+                                ('date_invoice', '&lt;=', (context_today() + relativedelta(weekday=6)).strftime('%Y-%m-%d')),
+                            ]"/>
+                    <filter string="Mes Actual"
+                            domain="[('date_invoice', '&gt;=', datetime.datetime.now().strftime('%Y-%m-01'))]"/>
+                    <group expand="0" string="Agrupar por">
+                        <filter name="journal" string="Diario" context="{'group_by':'journal_id'}"/>
+                        <filter name="partner" string="Nombre Cliente" context="{'group_by':'nombre'}"/>
+                        <filter name="warehouse" string="Sucursal" context="{'group_by':'warehouse_id'}"/>
+                        <filter name="estado" string="Estado Factura" context="{'group_by':'estado'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="view_detalle_ventas_tree">
+            <field name="name">detalle.ventas.tree</field>
+            <field name="model">detalle.ventas</field>
+            <field name="arch" type="xml">
+                <tree string="Seguimiento de Cobranzas">
+                    <field name="journal_id" invisible="1"/>
+                    <field name="trans"/>
+                    <field name="number"/>
+                    <field name="clie"/>
+                    <field name="nombre"/>
+                    <field name="nit"/>
+                    <field name="amount_total" sum="Total"/>
+                    <field name="amount_discount" sum="Total"/>
+                    <field name="neto" sum="Total"/>
+                    <field name="amount_total_bs" sum="Total"/>
+                    <field name="amount_discount_bs" sum="Total"/>
+                    <field name="neto_bs" sum="Total"/>
+                    <field name="estado"/>
+                    <field name="date_invoice"/>
+                    <field name="warehouse_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_detalle_ventas" model="ir.actions.act_window">
+            <field name="name">Detalle de Ventas</field>
+            <field name="res_model">detalle.ventas</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="context">{"search_default_estado_fb":1}</field>
+            <field name="view_id"></field>
+            <field name="help">Detalle de Ventas</field>
+        </record>
+
+        <menuitem id="menu_detalle_ventas" parent="sales_team.menu_sale_report" sequence="99"
+                  action="action_detalle_ventas"/>
+
+
+    </data>
+</odoo>

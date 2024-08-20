@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_receipt_document_alu">
+            <t t-call="report.external_layout">
+                <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})"/>
+                <div class="page">
+
+                    <br/>
+                    <div class="header" style="text-align:center;">
+                        <span t-field="o.company_id.logo"
+                              t-field-options='{"widget": "image", "style":"width: 100px; margin-right: 2px; display:inline"}'/>
+                        <h3>
+                            <strong>Recibo de Pago Proveedor</strong>
+                        </h3>
+                    </div>
+                    <table class="table table-condensed" style="width:500px; margin-left:160px;">
+                        <tr>
+                            <td style="width:220px">Nombre Proveedor</td>
+                            <td style="width:280px">
+                                <p t-field="o.partner_id"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Nro de compra</td>
+                            <td>
+                                <p t-field="o.number"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Forma de Pago</td>
+                            <td>
+                                <t t-set="total_pago" t-value="0.0"/>
+                                <t t-set="pago_entrego" t-value="''"/>
+                                <t t-foreach="o.payment_move_line_ids" t-as="pm">
+                                    <t t-foreach="pm.matched_credit_ids" t-as="mc">
+                                        <t t-foreach="o.move_id.line_ids" t-as="ln">
+                                            <t t-if="mc.credit_move_id.id == ln.id">
+                                                <t t-if="mc.credit_move_id.amount_currency == 0.0">
+                                                    <t t-set="total_pago" t-value="total_pago + mc.amount"/>
+                                                    <!--<span t-field="mc.amount"
+                                                          t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>-->
+                                                </t>
+                                                <t t-if="mc.credit_move_id.amount_currency != 0.0">
+                                                    <t t-set="total_pago"
+                                                       t-value="total_pago + abs(mc.amount_currency)"/>
+                                                    <t t-set="pago_entrego"
+                                                       t-value="mc.create_uid.name"/>
+                                                    <!--<span t-esc="abs(mc.amount_currency)"
+                                                          t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>-->
+                                                </t>
+                                            </t>
+                                        </t>
+                                    </t>
+                                    <span t-field="pm.journal_id"/>,
+                                    <!--<t t-if="pay.journal_id.currency_id">
+
+                                    </t>
+                                    <t t-else="">
+                                        <t t-set="total_pago" t-value="total_pago + o.amount_total/6.97"/>
+                                    </t>-->
+                                </t>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Concepto</td>
+                            <td>
+                                <p t-field="o.reference"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Import Bs.</td>
+                            <td>
+                                <p t-esc="'{0:,.2f}'.format(total_pago)"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Import $us</td>
+                            <td>
+                                <p t-esc="'{0:,.2f}'.format(total_pago/6.97)"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p t-esc="pago_entrego"/>
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Entregue Conforme</td>
+                            <td>Recibi Conforme</td>
+                        </tr>
+                    </table>
+
+                    <p style="text-align:center;">Gracias por hacer negocios con nosotros</p>
+                </div>
+            </t>
+        </template>
+
+        <template id="report_receipt_alu">
+            <t t-call="report.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="kardex_inventario.report_receipt_document_alu" t-lang="o.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

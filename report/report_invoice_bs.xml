@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_invoice_document_bs">
+            <t t-call="report.external_layout">
+                <t t-call="report.html_container">
+                    <t t-foreach="docs" t-as="o">
+                        <div class="page">
+                            <div class="col-xs-6" align="left">
+                                <img style="width:90px;height:90px" t-if="res_company.logo"
+                                     t-att-src="'data:image/png;base64,%s' %res_company.logo"/>
+                                <p style="font-size:14px">
+                                    <strong>
+                                        <span t-field="o.razon"/>
+                                        <br/>
+                                    </strong>
+                                </p>
+                                <p style="font-size:10px">
+                                    <span t-field="o.sucursal"/>
+                                    <br/>
+                                    <span t-field="o.direccion"/>
+                                </p>
+                            </div>
+        
+                            <div class="col-xs-6" align="right">
+                                <p class="border-black">
+                                    <br/>
+                                    <br/>
+                                    <br/>
+                                    <strong>NIT:</strong>
+                                    <span t-field="o.nit_empresa"/>
+                                    <br/>
+                                    <strong>FACTURA Nro.:</strong>
+                                    <span t-field="o.number"/>
+                                    <br/>
+                                    <strong>AUTORIZACION:</strong>
+                                    <span t-field="o.autorizacion"/>
+                                    <br/>
+                                    <strong>
+                                        <p align="right">oooORIGINAL</p>
+                                    </strong>
+                                    <p style="font-size:10px">
+                                        <span t-field="o.actividad"/>
+                                    </p>
+                                </p>
+        
+                            </div>
+        
+                            <p align="center" style="font-weight:bold;font-size:18px">FACTURAA</p>
+        
+                            <div class="col-xs-6">
+                                <p align="left" style="font-size:12px">
+                                    <strong>Lugar y Fecha:</strong>
+                                    <span t-field="o.unipersonal"/>,
+                                    <span t-field="o.date_invoice"/>
+                                    <br/>
+                                    <strong>Señor(es):</strong>
+                                    <span t-field="o.partner_id.name"/>
+                                    <br/>
+                                </p>
+                            </div>
+        
+                            <div class="col-xs-6">
+                                <p align="right" style="font-size:12px">
+                                    <strong>NIT/CI:</strong>
+                                    <span t-field="o.partner_id.nit"/>
+                                </p>
+                            </div>
+        
+        
+                            <!-- Is there a discount on at least one line? -->
+                            <t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])"/>
+                            <div style="padding-top:5px;">
+                                <table class="table table-condensed" style="font-size:12px">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-right">Caaaantidad</th>
+                                            <th>Descripción</th>
+                                            <th class="hidden">Source Document</th>
+                                            <th class="text-right">Precio Bs.</th>
+                                            <th t-if="display_discount" class="text-right">Desc.(%)</th>
+                                            <th class="text-right"></th>
+                                            <th class="text-right">Total Bs.</th>
+                                        </tr>
+                                    </thead>
+                                    <t t-set="total_desc" t-value="0"/>
+                                    <t t-set="total_sin_desc" t-value="0"/>
+                                    <tbody class="invoice_tbody">
+                                        <tr t-foreach="o.invoice_line_ids" t-as="l">
+                                            <td class="text-center">
+                                                <t t-set="foo10" t-value="l.quantity"/>
+                                                <span t-esc="'%.2f'% foo10"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="l.name"/>
+                                            </td>
+                                            <td class="hidden">
+                                                <span t-field="l.origin"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-set="foo7" t-value="l.price_unit"/>
+                                                <span t-esc="'%.2f'% foo7"/>
+                                            </td>
+                                            <td t-if="display_discount" class="text-right">
+                                                <t t-set="descuento" t-value="l.discount"/>
+                                                <span t-esc="'%.2f'% descuento"/>
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-set="foo4" t-value="l.price_unit"/>
+                                                <!--span t-esc="'%.2f'% foo4"/-->
+                                            </td>
+                                            <td class="text-right">
+                                                <t t-set="foo5" t-value="l.price_unit*l.quantity"/>
+                                                <t t-set="foo5bs" t-value="foo5"/>
+                                                <t t-set="total_sin_desc" t-value="total_sin_desc + foo5bs"/>
+                                                <span t-esc="'%.2f'% foo5bs"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+        
+                            <div class="col-xs-4 pull-right">
+                                <div>
+                                    <table class="table table-condensed">
+                                        <tr class="border-black">
+                                            <tr>
+                                                <td>Subtotal</td>
+                                                <td class="text-right">
+                                                    <t t-set="desc_bs" t-value="o.amount_discount"/>
+                                                    <t t-set="subtotaldesc" t-value="total_sin_desc"/>
+                                                    <span t-esc="'%.2f'% subtotaldesc"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Descuentos</td>
+                                                <td class="text-right">
+                                                    <t t-set="foo8" t-value="total_sin_desc - o.x_total"/>
+                                                    <span t-esc="'%.2f'% foo8"/>
+                                                </td>
+                                            </tr>
+                                            <!--tr>
+                                                <td>Descuentos</td>
+                                                <td class="text-right">
+                                                    <t t-set="desc_bs" t-value="o.amount_discount*6.97"/>
+                                                    <span t-esc="desc_bs" t-field-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.currency_id&quot;}"/>
+                                                </td>
+                                            </tr-->
+                                            <tr>
+                                                <td>
+                                                    <strong>TOTAL</strong>
+                                                </td>
+                                                <td class="text-right">
+                                                    <t t-set="total_bs" t-value="o.x_total"/>
+                                                    <span t-esc="'%.2f'% total_bs"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <t t-set="relleno_qr" t-value="0"/>
+                                                    <t t-set="descuento_bs" t-value="total_sin_desc - o.x_total"/>
+                                                    <t t-set="descuento_bs2" t-value="'%.2f'% descuento_bs"/>
+                                                    <t t-set="subtotaldesc" t-value="o.x_total+descuento_bs"/>
+                                                    <t t-set="subtotaldesc2" t-value="'%.2f'% subtotaldesc"/>
+                                                    <t t-set="base_imponible" t-value="o.x_total"/>
+                                                    <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('QR', o.nit_empresa+o.separador_qr+o.number+o.separador_qr+o.autorizacion+o.separador_qr+o.date_invoice+o.separador_qr+str(float(subtotaldesc2))+o.separador_qr+str(float(base_imponible))+o.separador_qr+o.code+o.separador_qr+o.partner_id.nit+o.separador_qr+str(float(relleno_qr))+o.separador_qr+str(float(relleno_qr))+o.separador_qr+str(float(relleno_qr))+o.separador_qr+str(float(descuento_bs2))+o.separador_qr, 125, 125)"
+                                                         style="width:125px;height:125px"/>
+                                                </td>
+                                            </tr>
+                                        </tr>
+        
+                                    </table>
+                                </div>
+        
+                            </div>
+        
+                            <!--div class="col-xs-4 pull-right">
+                                <div>
+                                    <table class="table table-condensed">
+                                        <tr class="border-black">
+        
+                                            <td><strong>TOTAL $us.</strong></td>
+                                            <td class="text-right">
+                                                 <span t-field="o.amount_total"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>TOTAL Bs.</strong></td>
+                                            <td class="text-right">
+                                                <t t-set="foo99"  t-value="o.amount_total_company_signed" t-field-options="{&quot;widget&quot;: &quot;monetary&quot;}"/>
+                                                <span t-esc="'%.2f'% foo99"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+        
+                            </div-->
+        
+                            <!--div class="col-xs-6" align="left">
+                                <span t-field="o.amount_in_words"/> Bs. <br/>
+                                    <t t-set="relleno_qr" t-value="0"/>
+                                    <t t-set="descuento_bs" t-value="o.amount_discount*6.97"/>
+                                    <t t-set="descuento_bs2" t-value="'%.2f'% descuento_bs"/>
+                                    <t t-set="subtotaldesc" t-value="o.amount_total_company_signed+descuento_bs"/>
+                                    <t t-set="subtotaldesc2" t-value="'%.2f'% subtotaldesc"/>
+                                    <t t-set="base_imponible" t-value="o.amount_total_company_signed"/>
+                                    <img  t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('QR', o.nit_empresa+o.unipersonal+o.number+o.unipersonal+o.autorizacion+o.unipersonal+o.date_invoice+o.unipersonal+str(float(subtotaldesc2))+o.unipersonal+str(float(base_imponible))+o.unipersonal+o.code+o.unipersonal+o.partner_id.nit+o.unipersonal+str(float(relleno_qr))+o.unipersonal+str(float(relleno_qr))+o.unipersonal+str(float(relleno_qr))+o.unipersonal+str(float(descuento_bs2))+o.unipersonal, 125, 125)" style="width:125px;height:125px"/>
+                            </div-->
+                            <br/>
+        
+                            <div class="col-xs-6 pull-left">
+                                <span>
+                                    <strong>Son :</strong>
+                                </span>
+                                <span t-field="o.amount_in_words"/>
+                                <br/>
+                            </div>
+        
+                            <div>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <strong>CODIGO CONTROL:</strong>
+                                <span t-field="o.code"/>
+                                <br/>
+                                <strong>FECHA LIMITE EMISIÓN:</strong>
+                                <span t-field="o.fecha"/>
+                                <br/>
+                                <br/>
+        
+        
+                                <p t-if="o.comment">
+                                    <!--strong>Comment:</strong>
+                                    <span t-field="o.comment"/-->
+                                </p>
+        
+                                <p t-if="o.payment_term_id">
+                                    <!--span t-field="o.payment_term_id.note"/-->
+                                </p>
+        
+                                <p t-if="o.fiscal_position_id.note">
+                                    <!--strong>Fiscal Position Remark:</strong>
+                                    <span t-field="o.fiscal_position_id.note"/-->
+                                </p>
+        
+                            </div>
+                            <div class="col-xs-12" align="center">
+                                <span style="color:#000000 !important;font-size:10px" t-field="o.leyenda"/>
+                                <br/>
+                                <span style="color:#000000 !important;font-size:10px" t-field="o.leyenda2"/>
+                                <br/>
+                            </div>       
+        
+                        </div>
+                    </t>
+                </t>
+            </t>                
+        </template>
+
+        <template id="report_invoice_bs">
+            <t t-call="report.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="kardex_inventario.report_invoice_document_bs" t-lang="o.partner_id.lang"/>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+                id="kardex_xlsx"
+                model="kardex.inventario.wizard"
+                string="Imprimir Kardex"
+                report_type="xlsx"
+                name="kardex_inventario.kardex_xlsx.xlsx"
+                file="kardex_inventario.kardex_xlsx.xlsx"
+                attachment_use="False"
+        />
+    </data>
+</odoo>

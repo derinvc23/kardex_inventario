@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report
+                id="account_receipt_alu"
+                model="account.invoice"
+                string="Recibo Pago Proveedor"
+                report_type="qweb-pdf"
+                name="kardex_inventario.report_receipt_alu"
+                file="kardex_inventario.report_receipt_alu"
+        />
+    </data>
+</odoo>
